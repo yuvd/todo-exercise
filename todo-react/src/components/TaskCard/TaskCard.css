@@ -1,0 +1,45 @@
+.editArea {
+	resize: none;
+	border: 0;
+	outline: none;
+	width: 100%;
+	height: 100%;
+	text-align: justify;
+	-moz-text-align-last: center; /* Firefox 12+ */
+	text-align-last: center;
+}
+
+.cardContainer {
+	display: flex;
+	margin-bottom: 15px;
+	margin-left: 30px;
+}
+
+.taskCard {
+	/* margin-right: 10px;
+	margin-left: 10px; */
+	width: 250px;
+	height: 115px;
+}
+
+.icon {
+	width: 20px !important;
+	padding-left: 10px;
+}
+
+.saveIcon {
+	color: green;
+}
+
+.saveIcon:hover {
+	cursor: pointer;
+}
+
+.deleteIcon {
+	color: red;
+	height: 15px;
+}
+
+.deleteIcon:hover {
+	cursor: pointer;
+}
