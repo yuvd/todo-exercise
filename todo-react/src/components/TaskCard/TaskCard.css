@@ -25,6 +25,10 @@
 	padding-left: 10px;
 }
 
+.icon:hover {
+	cursor: pointer;
+}
+
 .saveIcon {
 	color: green;
 }

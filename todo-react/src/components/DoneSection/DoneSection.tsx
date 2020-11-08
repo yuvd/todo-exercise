@@ -15,7 +15,7 @@ function DoneSection(props: SectionProps) {
 			<TaskCard {...props} task={task} />
 		));
 		return doneCards;
-	}, [props, tasks]);
+	}, [tasks, props]);
 
 	return (
 		<div className="categoryContainer">
