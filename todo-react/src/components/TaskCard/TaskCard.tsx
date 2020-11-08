@@ -1,10 +1,18 @@
-import React, { ChangeEvent, useState, useRef } from "react";
+import React, {
+	ChangeEvent,
+	useState,
+	useRef,
+	useMemo,
+	useCallback,
+} from "react";
 import { Card } from "@material-ui/core";
 import "./TaskCard.css";
 import CheckIcon from "@material-ui/icons/Check";
 import DeleteIcon from "@material-ui/icons/Delete";
 import { SectionProps } from "../../types/SectionTypes";
 import Task from "../../models/Task";
+import { TASK_STATUSES } from "../../types/TaskTypes";
+import KeyboardReturnIcon from "@material-ui/icons/KeyboardReturn";
 
 function EditArea(props: Record<any, any>) {
 	return <textarea {...props} className={"editArea"} rows={5} cols={25} />;
@@ -13,20 +21,58 @@ function EditArea(props: Record<any, any>) {
 type Props = SectionProps & { task: Task }; // Get access to the task this card should represent, as well as the ability to modify the list of tasks
 
 function TaskCard(props: Props) {
-	const [editing, toggleEditing] = useState<boolean>(true);
+	const [editing, toggleEditing] = useState<boolean>(
+		props.task.content ? false : true
+	);
 
 	const cardContainerRef = useRef<HTMLDivElement>(null);
 
-	const removeCard = () => {
+	const removeCard = useCallback(() => {
 		const { tasks, setTasks } = props;
 
 		const filteredTasks = tasks.filter((task) => task !== props.task);
 		setTasks(filteredTasks);
+	}, [props]);
+
+	const completeTask = () => {
+		const { task, tasks, setTasks } = props;
+
+		task.status = TASK_STATUSES.DONE;
+		setTasks([...tasks]);
 	};
+
+	const uncompleteTask = useCallback(() => {
+		const { task, tasks, setTasks } = props;
+
+		task.status = TASK_STATUSES.NOT_DONE;
+		setTasks([...tasks]);
+	}, [props]);
+
+	const icon = useMemo(() => {
+		if (props.task.status === TASK_STATUSES.DONE) {
+			return <KeyboardReturnIcon className="icon" onClick={uncompleteTask} />;
+		} else {
+			return editing ? (
+				<CheckIcon
+					className="icon saveIcon"
+					onClick={() => toggleEditing(false)}
+				/>
+			) : (
+				<DeleteIcon className="icon deleteIcon" onClick={removeCard} />
+			);
+		}
+	}, [props.task.status, editing, removeCard, uncompleteTask]);
 
 	return (
 		<div ref={cardContainerRef} className="cardContainer">
-			<Card className="taskCard" raised>
+			<Card
+				className="taskCard"
+				raised
+				onClick={() => {
+					if (!editing && props.task.status !== TASK_STATUSES.DONE)
+						completeTask();
+				}}
+			>
 				{editing ? (
 					<EditArea
 						onChange={(e: ChangeEvent<HTMLTextAreaElement>) =>
@@ -37,14 +83,7 @@ function TaskCard(props: Props) {
 					props.task.content
 				)}
 			</Card>
-			{editing ? (
-				<CheckIcon
-					className="icon saveIcon"
-					onClick={() => toggleEditing(false)}
-				/>
-			) : (
-				<DeleteIcon className="icon deleteIcon" onClick={removeCard} />
-			)}
+			{icon}
 		</div>
 	);
 }

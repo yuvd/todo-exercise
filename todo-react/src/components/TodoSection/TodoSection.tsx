@@ -14,6 +14,8 @@ function TodoSection(props: SectionProps) {
 	};
 
 	const todoCards = useMemo(() => {
+		// console.log("Ran");
+		// console.log(tasks);
 		const todoTasks = tasks.filter(
 			(task) => task.status === TASK_STATUSES.NOT_DONE
 		);
