@@ -10,7 +10,6 @@ function TodoSection(props: SectionProps) {
 	const { tasks, setTasks } = props;
 
 	const addTask = () => {
-		// setTasks([...todoCards, <TaskCard {...props} />]);
 		setTasks([...tasks, new Task(TASK_STATUSES.NOT_DONE, "")]);
 	};
 
