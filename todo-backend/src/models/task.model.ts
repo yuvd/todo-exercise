@@ -1,5 +1,5 @@
-import { Task } from "../../types/tasks/TaskTypes";
-import { model, Schema } from "mongoose";
+import { Task } from "../types/Tasks/TaskTypes";
+import { model, Schema, Document } from "mongoose";
 
 export const taskSchema: Schema = new Schema(
 	{
@@ -15,4 +15,4 @@ export const taskSchema: Schema = new Schema(
 	{ timestamps: true }
 );
 
-export default model<Task>("Task", taskSchema);
+export default model<Task & Document>("Task", taskSchema);
