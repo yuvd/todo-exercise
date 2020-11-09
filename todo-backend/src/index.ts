@@ -4,12 +4,14 @@ import bodyParser from "body-parser";
 import helmet from "helmet";
 import cors from "cors";
 import mongoose from "mongoose";
+import router from "./routes/index";
 
 const app: Express = express();
 const PORT: string | number = process.env.PORT || 8000;
 app.use(cors());
 app.use(helmet());
 app.use(bodyParser.json());
+app.use(router);
 
 const url: string = "mongodb://localhost:27017/TODO-DB";
 const options = { useNewUrlParser: true, useUnifiedTopology: true };
