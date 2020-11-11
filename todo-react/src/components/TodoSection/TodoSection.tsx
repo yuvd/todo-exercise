@@ -6,6 +6,7 @@ import { SectionProps } from "../../types/SectionTypes";
 import Task from "../../models/Task";
 import { TASK_STATUSES } from "../../types/TaskTypes";
 import axios from "axios";
+import shortid from "shortid";
 
 function TodoSection(props: SectionProps) {
 	const { tasks, setTasks } = props;
@@ -28,7 +29,7 @@ function TodoSection(props: SectionProps) {
 			(task) => task.status === TASK_STATUSES.NOT_DONE
 		);
 		const todoCards = todoTasks.map((task) => (
-			<TaskCard {...props} task={task} />
+			<TaskCard key={shortid.generate()} {...props} task={task} />
 		));
 		return todoCards;
 	}, [tasks, props]);
