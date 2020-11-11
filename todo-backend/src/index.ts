@@ -11,6 +11,7 @@ const PORT: string | number = process.env.PORT || 8000;
 app.use(cors());
 app.use(helmet());
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 app.use(router);
 
 const url: string = "mongodb://localhost:27017/TODO-DB";

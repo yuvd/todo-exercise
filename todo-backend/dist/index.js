@@ -15,6 +15,7 @@ const PORT = process.env.PORT || 8000;
 app.use(cors_1.default());
 app.use(helmet_1.default());
 app.use(body_parser_1.default.json());
+app.use(body_parser_1.default.urlencoded({ extended: true }));
 app.use(index_1.default);
 const url = "mongodb://localhost:27017/TODO-DB";
 const options = { useNewUrlParser: true, useUnifiedTopology: true };

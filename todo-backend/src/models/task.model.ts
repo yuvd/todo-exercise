@@ -9,7 +9,6 @@ export const taskSchema: Schema = new Schema(
 		},
 		content: {
 			type: String,
-			required: true,
 		},
 	},
 	{ timestamps: true }

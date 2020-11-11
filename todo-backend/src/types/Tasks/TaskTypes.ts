@@ -4,7 +4,7 @@ export enum TASK_STATUSES {
 }
 
 export interface Task {
-	id?: string;
+	_id?: string;
 	status: keyof typeof TASK_STATUSES;
 	content: string;
 }

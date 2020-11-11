@@ -5,7 +5,7 @@ import { TASK_STATUSES } from "../../types/TaskTypes";
 import TaskCard from "../TaskCard/TaskCard";
 
 function DoneSection(props: SectionProps) {
-	const { tasks, setTasks } = props;
+	const { tasks } = props;
 
 	const doneCards = useMemo(() => {
 		const doneTasks = tasks.filter(
