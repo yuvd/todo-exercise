@@ -9,7 +9,6 @@ exports.taskSchema = new mongoose_1.Schema({
     },
     content: {
         type: String,
-        required: true,
     },
 }, { timestamps: true });
 exports.default = mongoose_1.model("Task", exports.taskSchema);
