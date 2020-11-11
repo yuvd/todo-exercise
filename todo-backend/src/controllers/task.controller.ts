@@ -1,19 +1,21 @@
 import { Request, Response, NextFunction } from "express";
 import { isNamedExportBindings } from "typescript";
-import Task from "../models/task.model";
+import MongooseTask from "../models/mongoose/task.model";
+import SQLTask from "../models/sequelize/task.model";
 import { Task as TaskInterface, TASK_STATUSES } from "../types/Tasks/TaskTypes";
+import { v4 as uuid } from "uuid";
 
-const addTask = (req: Request, res: Response, next: NextFunction) => {
+const addTask = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const taskJson: TaskInterface = req.body;
 		const { status, content } = taskJson;
-		validateTask(status, content);
+		const id = uuid(); // Use same uuidv4 for both SQL and MongoDB entries for uniformity
 
-		const task = new Task({ status, content });
-		task.save();
+		await addTask_sql(id, status, content);
+		await addTask_mdb(id, status, content);
 
-		res.statusCode = 200;
-		res.send(task.id);
+		res.statusCode = 201;
+		res.send(id);
 	} catch (err) {
 		next(err);
 	}
@@ -21,26 +23,30 @@ const addTask = (req: Request, res: Response, next: NextFunction) => {
 
 const getTasks = async (req: Request, res: Response, next: NextFunction) => {
 	try {
-		const tasks = await Task.find({}).exec();
+		const tasks = await getTasks_sql();
+
 		res.statusCode = 200;
 		res.send(tasks);
 	} catch (err) {
-		next(err);
+		// If fetching from the SQL DB fails, try from MongoDB
+		try {
+			const tasks = await getTasks_mdb();
+
+			res.statusCode = 200;
+			res.send(tasks);
+		} catch (err) {
+			next(err);
+		}
 	}
 };
 
 const updateTask = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const taskJson: TaskInterface = req.body;
-		validateTask(taskJson.status, taskJson.content);
-		if (!taskJson._id) throw new Error("ID must be provided");
+		const { _id, status, content } = taskJson;
 
-		const task = await Task.findById(taskJson._id).exec();
-		if (!task) throw new Error("Task does not exist");
-
-		task.status = taskJson.status;
-		task.content = taskJson.content;
-		task.save();
+		await updateTask_sql(_id, status, content);
+		await updateTask_mdb(_id, status, content);
 
 		res.statusCode = 200;
 		res.send();
@@ -52,9 +58,9 @@ const updateTask = async (req: Request, res: Response, next: NextFunction) => {
 const deleteTask = async (req: Request, res: Response, next: NextFunction) => {
 	try {
 		const { _id } = req.body;
-		if (!_id) throw new Error("ID must be provided");
 
-		const task = await Task.findByIdAndDelete(_id).exec();
+		await deleteTask_sql(_id);
+		await deleteTask_mdb(_id);
 
 		res.statusCode = 200;
 		res.send();
@@ -63,10 +69,64 @@ const deleteTask = async (req: Request, res: Response, next: NextFunction) => {
 	}
 };
 
-// Helpers
-const validateTask = (status: any, content: any) => {
-	if (!(status in TASK_STATUSES) || typeof content !== "string")
-		throw new Error("Invalid task.");
+// SQL DB Actions
+const addTask_sql = async (id: string, status: string, content: string) => {
+	const post = await SQLTask.create({ _id: id, status, content });
+};
+
+const getTasks_sql = async () => {
+	return await SQLTask.findAll({ raw: true });
+};
+
+const updateTask_sql = async (
+	id: string | undefined,
+	status: keyof typeof TASK_STATUSES,
+	content: string
+) => {
+	const task = await SQLTask.findByPk(id);
+	if (!task) throw new Error("Task does not exist");
+	task.update({ content, status });
+};
+
+const deleteTask_sql = async (id: string) => {
+	const task = await SQLTask.findByPk(id);
+	if (!task) throw new Error("Task does not exist");
+
+	await task?.destroy();
+};
+
+// Mongoose DB Actions
+const addTask_mdb = async (id: string, status: string, content: string) => {
+	try {
+		const task = new MongooseTask({ _id: id, status, content });
+		await task.save();
+	} catch (err) {
+		throw err;
+	}
+};
+
+const getTasks_mdb = async () => {
+	return await MongooseTask.find({}).exec();
+};
+
+const updateTask_mdb = async (
+	id: string | undefined,
+	status: keyof typeof TASK_STATUSES,
+	content: string
+) => {
+	const task = await MongooseTask.findById(id).exec();
+	if (!task) throw new Error("Task does not exist");
+
+	task.status = status;
+	task.content = content;
+	await task.save();
+};
+
+const deleteTask_mdb = async (id: string) => {
+	const task = await MongooseTask.findById(id).exec();
+	if (!task) throw new Error("Task does not exist");
+
+	await task.deleteOne();
 };
 
 export default { addTask, getTasks, updateTask, deleteTask };

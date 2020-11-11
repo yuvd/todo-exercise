@@ -1,0 +1,2 @@
+2020-11-11 15:48:31.620 IST [71836] FATAL:  lock file "postmaster.pid" already exists
+2020-11-11 15:48:31.620 IST [71836] HINT:  Is another postmaster (PID 71703) running in data directory "/Users/shepard/code/postgresql/db"?

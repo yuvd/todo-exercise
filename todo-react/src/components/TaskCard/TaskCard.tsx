@@ -40,17 +40,19 @@ function TaskCard(props: Props) {
 		}
 	}, [props]);
 
-	const completeTask = () => {
+	const completeTask = async () => {
 		const { task, tasks, setTasks } = props;
 
 		task.status = TASK_STATUSES.DONE;
+		await task.save();
 		setTasks([...tasks]);
 	};
 
-	const uncompleteTask = useCallback(() => {
+	const uncompleteTask = useCallback(async () => {
 		const { task, tasks, setTasks } = props;
 
 		task.status = TASK_STATUSES.NOT_DONE;
+		await task.save();
 		setTasks([...tasks]);
 	}, [props]);
 
